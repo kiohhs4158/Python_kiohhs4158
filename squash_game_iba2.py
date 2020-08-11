@@ -35,7 +35,7 @@ def init_game():
     block_position_y = random.randint(60, 100)
     block_size_x = random.randint(30, 120)
     block_size_y = random.randint(40, 300)
-    block_move_x = random.randint(10, 20)
+    block_move_x = select_speed
 #ゲーム画面の描画
 def draw_game():
     canvas.delete('all')
@@ -63,11 +63,6 @@ def move_ball():
     
     if is_gameover:
         return
-    #ボールの移動
-    if 0 <= ball_position_x + ball_move_x <= 640:
-        ball_position_x = ball_position_x + ball_move_x
-    if 0 <= ball_position_y + ball_move_y <= 480:
-        ball_position_y = ball_position_y + ball_move_y
     #左右の壁に当たったかどうかの判定
     if ball_position_x + ball_move_x < 0 or ball_position_x + ball_move_x >640:
         ball_move_x *= -1
@@ -87,23 +82,32 @@ def move_ball():
         if ball_move_x < 0:
             ball_move_x *= -1
     #障害物に当たったかどうかの判定
-    #上下
+    #障害物の上下
     if ball_move_y > 0 and \
-       block_position_y <= ball_position_y + ball_move_y <= block_position_y + ball_size  and \
-       block_position_x <= ball_position_x + ball_move_x <= block_position_x + block_size_x:
+       block_position_y <= ball_position_y + ball_move_y <= block_position_y + block_size_y / 2  and \
+       block_position_x + block_move_x <= ball_position_x + ball_move_x <= block_position_x + block_move_x + block_size_x:
         ball_move_y *= -1
     if ball_move_y < 0 and \
-       block_position_y + block_size_y <= ball_position_y + ball_move_y <= block_position_y + block_size_y + ball_size  and \
-       block_position_x <= ball_position_x + ball_move_x <= block_position_x + block_size_x:
+       block_position_y - block_size_y / 2 <= ball_position_y + ball_move_y <= block_position_y + block_size_y   and \
+       block_position_x + block_move_x <= ball_position_x + ball_move_x <= block_position_x + block_move_x + block_size_x:
         ball_move_y *= -1
-    #左右
+    #障害物の左右
     if ball_move_x > 0 and \
-       block_position_x +block_move_x  <= ball_position_x + ball_move_x <= block_position_x +block_move_x + ball_size and \
+       block_position_x +block_move_x  <= ball_position_x + ball_move_x <= block_position_x +block_move_x + block_size_x / 2 and \
+       block_position_y <= ball_position_y + ball_move_y  <= block_position_y + block_size_y:
+        ball_move_x *= -1
+    if ball_move_x < 0 and \
+       block_position_x + block_move_x - block_size_x / 2 <= ball_position_x + ball_move_x <= block_position_x + block_size_x + block_move_x and \
        block_position_y <= ball_position_y + ball_move_y  <= block_position_y + block_size_y:
         ball_move_x *= -1
     #ミスの判定
     if ball_position_y + ball_move_y > 480:
         is_gameover = True
+    #ボールの移動
+    if 0 <= ball_position_x + ball_move_x <= 640:
+        ball_position_x = ball_position_x + ball_move_x
+    if 0 <= ball_position_y + ball_move_y <= 480:
+        ball_position_y = ball_position_y + ball_move_y
 #ラケットの移動
 def motion(event):
     if is_gameover:
@@ -135,9 +139,9 @@ def game_loop():
     draw_game()
     draw_racket()
     draw_block()
-    move_block()
     draw_ball()
     move_ball()
+    move_block()
     root.after(speed, game_loop)
 #ゲームのメイン処理
 draw_start()

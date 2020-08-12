@@ -3,22 +3,46 @@ from tkinter import ttk
 from tkinter import *
 from tkinter.ttk import *
 import random
-#ウィンドウの作成
-root = Tk()
-canvas = Canvas(root, width = 640, height = 480)
-canvas.pack()
 #スタート画面の描画
-def draw_start():
-    global select_size, select_speed
+def draw_start():    
+    start = Tk()
+    start.title(u'Squash Game!')
+    canvas_st = Canvas(start, width = 640, height = 480)
+    canvas_st.pack()
+    canvas_st.create_rectangle(0, 0, 640, 480, fill = 'white')
+    canvas_st.create_text(320, 140, text = 'Welcome to Squash Game',
+                          fill = 'blue', font = ('Meiryo UI', 24), justify = 'center')
+    canvas_st.create_text(320, 220, text = 'ラケットの大きさを選択してください', font = ('Meiryo UI', 16), justify = 'center')
+
+    global select
+    select = IntVar(start, value = 150)
+    #選択値表示用ラベルの設定
+    #size_label = ttk.Label(start, width = 10, textvariable = select_size)
+    #size_label.place(x = 320, y = 250)
+    #ラジオボタンの設定
+    for i in range(3):
+        size_radio = ttk.Radiobutton(start, text = str(75 * (i + 1)),value = 75 * (i + 1), variable = select)
+        size_radio.place(x = 260 + (i * 60), y = 270)
+
+    start_btn = ttk.Button(start, text = 'Start', width = 30, command = lambda:[close_start(), game_start()])
+    start_btn.place(x = 250, y = 320)
     
-    root.title(u'Squash Game!')
-    select_size = 100
-    select_speed = 15
+    def close_start():
+        global select_size
+        select_size = select.get()
+        canvas_st.delete('all')
+        start.destroy()
+
+draw_start()
 
 def game_start():
+    #ウィンドウの作成
+    root = Tk()
+    canvas = Canvas(root, width = 640, height = 480)
+    canvas.pack()
     #ゲームの初期化
     def init_game():
-        global is_gameover, point, speed
+        global is_gameover, point, speed, move_speed
         global ball_position_x, ball_position_y, ball_move_x, ball_move_y, ball_size
         global racket_center_x, racket_size
         global block_position_x, block_position_y, block_move_x, block_move_y, block_size_x, block_size_y
@@ -26,10 +50,11 @@ def game_start():
         is_gameover = False
         point = 0
         speed = 50
+        move_speed = 15
         ball_position_x = random.randint(400, 500)
         ball_position_y = random.randint(100, 200)
-        ball_move_x = select_speed
-        ball_move_y = select_speed * -1
+        ball_move_x = move_speed
+        ball_move_y = move_speed * -1
         ball_size = 10
         racket_center_x = 320
         racket_size = select_size
@@ -37,7 +62,7 @@ def game_start():
         block_position_y = random.randint(60, 100)
         block_size_x = random.randint(30, 120)
         block_size_y = random.randint(40, 300)
-        block_move_x = select_speed
+        block_move_x = move_speed
     #ゲーム画面の描画
     def draw_game():
         canvas.delete('all')
@@ -146,8 +171,6 @@ def game_start():
         move_block()
         root.after(speed, game_loop)
     #ゲームのメイン処理
-    draw_start()
     init_game()
     game_loop()
     root.mainloop()
-

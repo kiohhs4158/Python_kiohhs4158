@@ -102,12 +102,43 @@ def game_start():
             ball_move_y *= -1
             if ball_move_x > 0:
                 ball_move_x *= -1
+                
+            mes = random.randint(0, 2)
+            if mes == 0:
+                message = '素敵'
+            elif mes == 1:
+                message = '上手'
+            else:
+                message = 'ナイス'
+            point += 10
+            root.title(message + '！あなたの得点は' + str(point) + '点です')
         #ラケットの右側に当たったかどうかの判定
         if ball_position_y + ball_move_y >= 470 and \
            racket_center_x <= ball_position_x + ball_move_x <= racket_right_x + 5:
             ball_move_y *= -1
             if ball_move_x < 0:
                 ball_move_x *= -1
+                
+            mes = random.randint(0, 2)
+            if mes == 0:
+                message = '素敵'
+            elif mes == 1:
+                message = '上手'
+            else:
+                message = 'ナイス'
+            point += 10
+            root.title(message + '！あなたの得点は' + str(point) + '点です')
+        #ミスした時の判定
+        if ball_position_y + ball_move_y >= 480:
+            is_gameover = True
+            if point <= 50:
+                message = 'ドンマイ'
+            elif 50 < point <= 200:
+                message = '次は高得点を目指そう'
+            else:
+                message = 'あなたは最高のプレーヤーです'
+            
+            root.title('あなたの得点は' + str(point) + '点でした！' + message)
         #障害物に当たったかどうかの判定
         #障害物の上下
         if ball_move_y > 0 and \

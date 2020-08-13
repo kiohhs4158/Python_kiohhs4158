@@ -39,28 +39,35 @@ def game_start():
     canvas.pack()
     #ゲームの初期化
     def init_game():
-        global is_gameover, point, life, game_speed, move_speed
+        global is_gameover, point, life, game_speed
         global ball_position_x, ball_position_y, ball_move_x, ball_move_y, ball_size
         global racket_center_x, racket_size
-        global block_position_x, block_position_y, block_move_x, block_move_y, block_size_x, block_size_y
+        global block_position_x, block_position_y, block_size_x, block_size_y
+        global another_block_position_x, another_block_position_y, another_block_size_x, another_block_size_y
         
         is_gameover = False
         point = 0
         life = 3
         game_speed = 50
-        move_speed = 15
-        ball_position_x = random.randint(400, 500)
+        ball_position_x = random.randint(240, 400)
         ball_position_y = random.randint(100, 200)
-        ball_move_x = move_speed
-        ball_move_y = move_speed * -1
+        num = random.randint(0, 1)
+        if num == 0:
+            ball_move_x = 15 * -1
+        else:
+            ball_move_x = 15
+        ball_move_y = 15
         ball_size = 10
         racket_center_x = 320
         racket_size = select_size
-        block_position_x = 10
-        block_position_y = random.randint(60, 100)
-        block_size_x = random.randint(30, 120)
-        block_size_y = random.randint(40, 300)
-        block_move_x = move_speed
+        block_position_x = random.randint(60, 100)
+        block_position_y = random.randint(80, 120)
+        block_size_x = random.randint(80, 120)
+        block_size_y = random.randint(80, 140)
+        another_block_position_x = random.randint(420, 460)
+        another_block_position_y = random.randint(80, 120)
+        another_block_size_x = random.randint(80, 120)
+        another_block_size_y = random.randint(80, 140)
     #ゲーム画面の描画
     def draw_game():
         canvas.delete('all')
@@ -81,6 +88,8 @@ def game_start():
     def draw_block():
         canvas.create_rectangle(block_position_x, block_position_y,
                                 block_position_x + block_size_x, block_position_y + block_size_y, fill = 'red')
+        canvas.create_rectangle(another_block_position_x, another_block_position_y,
+                                another_block_position_x + another_block_size_x, another_block_position_y + another_block_size_y, fill = 'red')
     #的の描画
     def draw_target():
         for j in range(3):
@@ -98,14 +107,20 @@ def game_start():
         #天井に当たったかどうかの判定
         if ball_position_y + ball_move_y < 0:
             ball_move_y *= -1
-        #的に当たった時の判定
+        #的に当たった時の判定、的に当たるとポイント加算
         for k in range(3):
             if ball_position_y + ball_move_y < 10 and \
-               (160 * k + 120) <= ball_position_x + ball_move_x <= (160 * k + 200):
+               (160 * k + 115) <= ball_position_x + ball_move_x <= (160 * k + 205):
                 point += 10
+                #50ポイントごとにボールの移動量up
                 if point % 50 == 0 and point > 0:
-                    move_speed += 5
+                    if ball_move_x > 0:
+                        ball_move_x += 5
+                    elif ball_move_x < 0:
+                        ball_move_x -= 5
+                    ball_move_y -= 5
                 ball_move_y *= -1
+                #ランダムに跳ね返る方向を決定
                 num = random.randint(0, 1)
                 if num == 0:
                     ball_move_x *= -1
@@ -124,7 +139,7 @@ def game_start():
         #ミスした時の判定
         if ball_position_y + ball_move_y >= 480 and life > 0:
             life -= 1
-            ball_position_x = random.randint(400, 500)
+            ball_position_x = random.randint(240, 400)
             ball_position_y = random.randint(100, 200)
         elif ball_position_y + ball_move_y >= 480 and life == 0:
             is_gameover = True
@@ -137,24 +152,14 @@ def game_start():
             
             root.title('あなたの得点は' + str(point) + '点でした！' + message)
         #障害物に当たったかどうかの判定
-        #障害物の上下
-        if ball_move_y > 0 and \
-           block_position_y <= ball_position_y + ball_move_y <= block_position_y + block_size_y / 2  and \
-           block_position_x + block_move_x <= ball_position_x + ball_move_x <= block_position_x + block_move_x + block_size_x:
-            ball_move_y *= -1
-        if ball_move_y < 0 and \
-           block_position_y - block_size_y / 2 <= ball_position_y + ball_move_y <= block_position_y + block_size_y   and \
-           block_position_x + block_move_x <= ball_position_x + ball_move_x <= block_position_x + block_move_x + block_size_x:
-            ball_move_y *= -1
-        #障害物の左右
-        if ball_move_x > 0 and \
-           block_position_x +block_move_x  <= ball_position_x + ball_move_x <= block_position_x +block_move_x + block_size_x / 2 and \
-           block_position_y <= ball_position_y + ball_move_y  <= block_position_y + block_size_y:
+        if block_position_x <= ball_position_x + ball_move_x <= block_position_x + block_size_x and \
+            block_position_y <= ball_position_y + ball_move_y <= block_position_y + block_size_y:
             ball_move_x *= -1
-        if ball_move_x < 0 and \
-           block_position_x + block_move_x - block_size_x / 2 <= ball_position_x + ball_move_x <= block_position_x + block_size_x + block_move_x and \
-           block_position_y <= ball_position_y + ball_move_y  <= block_position_y + block_size_y:
+            ball_move_y *= -1
+        if another_block_position_x <= ball_position_x + ball_move_x <= another_block_position_x + another_block_size_x and \
+           another_block_position_y <= ball_position_y + ball_move_y <= another_block_position_y + another_block_size_y:
             ball_move_x *= -1
+            ball_move_y *= -1
         #ボールの移動
         if 0 <= ball_position_x + ball_move_x <= 640:
             ball_position_x = ball_position_x + ball_move_x
@@ -174,18 +179,6 @@ def game_start():
 
     root.bind('<Motion>', motion)
     root.bind('<Button>', click)
-    #障害物の移動
-    def move_block():
-        global block_position_x, block_move_x
-
-        if is_gameover:
-            return
-        #障害物が壁に当たったかどうかの判定
-        if block_position_x + block_move_x < 0 or block_position_x + block_size_x + block_move_x >640:
-            block_move_x *= -1
-        #障害物の移動
-        if 0 <= block_position_x + block_move_x and block_position_x + block_size_x + block_move_x <= 640:
-            block_position_x = block_position_x + block_move_x
     #ゲームの繰り返し処理
     def game_loop():
         draw_game()
@@ -194,7 +187,6 @@ def game_start():
         draw_block()
         draw_ball()
         move_ball()
-        move_block()
         root.after(game_speed, game_loop)
     #ゲームのメイン処理
     init_game()

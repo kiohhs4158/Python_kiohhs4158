@@ -31,7 +31,6 @@ def draw_start():
         start.destroy()
 
 draw_start()
-
 def game_start():
     #ウィンドウの作成
     root = Tk()
@@ -70,15 +69,23 @@ def game_start():
         another_block_size_y = random.randint(80, 140)
     #ゲーム画面の描画
     def draw_game():
+        if is_gameover:
+            return
         canvas.delete('all')
         canvas.create_rectangle(0, 0, 640, 480, fill = 'white', width = 0)
-        root.title("残りライフ：" + str(life) + "｜ポイント：" + str(point))
+        #ポイントとライフの表示
+        if not is_gameover:
+            root.title("残りライフ：" + str(life) + "｜ポイント：" + str(point))
     #ボールの描画
     def draw_ball():
+        if is_gameover:
+            return
         canvas.create_oval(ball_position_x - ball_size, ball_position_y - ball_size,
                            ball_position_x + ball_size, ball_position_y + ball_size, fill = 'yellow')
     #ラケットの描画
     def draw_racket():
+        if is_gameover:
+            return
         global racket_left_x, racket_right_x
         racket_left_x = racket_center_x - racket_size/2
         racket_right_x = racket_center_x + racket_size/2
@@ -87,12 +94,16 @@ def game_start():
         canvas.create_line(racket_center_x, 470, racket_center_x, 480, width = 4.0)
     #障害物の描画
     def draw_block():
+        if is_gameover:
+            return        
         canvas.create_rectangle(block_position_x, block_position_y,
                                 block_position_x + block_size_x, block_position_y + block_size_y, fill = 'red')
         canvas.create_rectangle(another_block_position_x, another_block_position_y,
                                 another_block_position_x + another_block_size_x, another_block_position_y + another_block_size_y, fill = 'red')
     #的の描画
     def draw_target():
+        if is_gameover:
+            return
         for j in range(3):
             canvas.create_rectangle(160 * j + 100, 0, 160 * j + 220, 10, fill = 'green')
     #ボールの移動
@@ -144,6 +155,15 @@ def game_start():
             ball_position_y = random.randint(100, 200)
         elif ball_position_y + ball_move_y >= 480 and life == 0:
             is_gameover = True
+            #gemeover画面の描画
+            canvas.delete('all')
+            root.destroy()
+            gameover = Tk()
+            canvas_go = Canvas(gameover, width = 640, height = 480)
+            canvas_go.pack()
+            canvas_go.create_rectangle(0, 0, 640, 480, fill = 'white')
+            canvas_go.create_text(320, 140, text = 'Game Over',
+                                  fill = 'red', font = ('Meiryo UI', 24), justify = 'center')
             if point <= 50:
                 message = 'ドンマイ'
             elif 50 < point <= 200:
@@ -151,21 +171,31 @@ def game_start():
             else:
                 message = 'あなたは最高のプレーヤーです'
             
-            root.title('あなたの得点は' + str(point) + '点でした！' + message)
-        #障害物に当たったかどうかの判定
-        if block_position_x <= ball_position_x + ball_move_x <= block_position_x + block_size_x and \
-            block_position_y <= ball_position_y + ball_move_y <= block_position_y + block_size_y:
-            ball_move_x *= -1
-            ball_move_y *= -1
-        if another_block_position_x <= ball_position_x + ball_move_x <= another_block_position_x + another_block_size_x and \
-           another_block_position_y <= ball_position_y + ball_move_y <= another_block_position_y + another_block_size_y:
-            ball_move_x *= -1
-            ball_move_y *= -1
+            gameover.title('あなたの得点は' + str(point) + '点でした！' + message)
+
+            continue_btn = ttk.Button(gameover, text = 'Continue', width = 30, command = lambda:[close_gameover(), game_start()])
+            continue_btn.place(x = 250, y = 320)
+
+            title_btn = ttk.Button(gameover, text = 'Title', width = 30, command = lambda:[close_gameover(), draw_start()])
+            title_btn.place(x = 250, y = 390)
+    
+            def close_gameover():
+                canvas_go.delete('all')
+                gameover.destroy()
         #ボールの移動
         if 0 <= ball_position_x + ball_move_x <= 640:
             ball_position_x = ball_position_x + ball_move_x
         if 0 <= ball_position_y + ball_move_y <= 480:
             ball_position_y = ball_position_y + ball_move_y
+        #障害物に当たったかどうかの判定
+        if block_position_x <= ball_position_x <= block_position_x + block_size_x and \
+            block_position_y <= ball_position_y <= block_position_y + block_size_y:
+            ball_move_x *= -1
+            ball_move_y *= -1
+        if another_block_position_x <= ball_position_x <= another_block_position_x + another_block_size_x and \
+           another_block_position_y <= ball_position_y <= another_block_position_y + another_block_size_y:
+            ball_move_x *= -1
+            ball_move_y *= -1
     #ラケットの移動
     def motion(event):
         if is_gameover:
@@ -174,12 +204,7 @@ def game_start():
         global racket_center_x
         racket_center_x = event.x
 
-    def click(event):
-        if event.num == 1 and is_gameover:
-            init_game()
-
     root.bind('<Motion>', motion)
-    root.bind('<Button>', click)
     #ゲームの繰り返し処理
     def game_loop():
         draw_game()

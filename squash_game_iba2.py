@@ -72,6 +72,7 @@ def game_start():
     def draw_game():
         canvas.delete('all')
         canvas.create_rectangle(0, 0, 640, 480, fill = 'white', width = 0)
+        root.title("残りライフ：" + str(life) + "｜ポイント：" + str(point))
     #ボールの描画
     def draw_ball():
         canvas.create_oval(ball_position_x - ball_size, ball_position_y - ball_size,
@@ -93,7 +94,7 @@ def game_start():
     #的の描画
     def draw_target():
         for j in range(3):
-            canvas.create_rectangle(160 * j + 120, 0, 160 * j + 200, 10, fill = 'green')
+            canvas.create_rectangle(160 * j + 100, 0, 160 * j + 220, 10, fill = 'green')
     #ボールの移動
     def move_ball():
         global is_gameover, point, life
@@ -104,13 +105,10 @@ def game_start():
         #左右の壁に当たったかどうかの判定
         if ball_position_x + ball_move_x < 0 or ball_position_x + ball_move_x >640:
             ball_move_x *= -1
-        #天井に当たったかどうかの判定
-        if ball_position_y + ball_move_y < 0:
-            ball_move_y *= -1
         #的に当たった時の判定、的に当たるとポイント加算
         for k in range(3):
             if ball_position_y + ball_move_y < 10 and \
-               (160 * k + 115) <= ball_position_x + ball_move_x <= (160 * k + 205):
+               (160 * k + 95) <= ball_position_x + ball_move_x <= (160 * k + 225):
                 point += 10
                 #50ポイントごとにボールの移動量up
                 if point % 50 == 0 and point > 0:
@@ -124,6 +122,9 @@ def game_start():
                 num = random.randint(0, 1)
                 if num == 0:
                     ball_move_x *= -1
+        #天井に当たったかどうかの判定
+        if ball_position_y + ball_move_y < 0:
+            ball_move_y *= -1
         #ラケットの左側に当たったかどうかの判定
         if ball_position_y + ball_move_y >= 470 and \
            racket_left_x - 5 <= ball_position_x + ball_move_x <= racket_center_x:

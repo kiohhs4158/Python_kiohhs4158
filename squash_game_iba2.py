@@ -16,9 +16,6 @@ def draw_start():
 
     global select
     select = IntVar(start, value = 150)
-    #選択値表示用ラベルの設定
-    #size_label = ttk.Label(start, width = 10, textvariable = select_size)
-    #size_label.place(x = 320, y = 250)
     #ラジオボタンの設定
     for i in range(3):
         size_radio = ttk.Radiobutton(start, text = str(75 * (i + 1)),value = 75 * (i + 1), variable = select)
@@ -42,14 +39,15 @@ def game_start():
     canvas.pack()
     #ゲームの初期化
     def init_game():
-        global is_gameover, point, speed, move_speed
+        global is_gameover, point, life, game_speed, move_speed
         global ball_position_x, ball_position_y, ball_move_x, ball_move_y, ball_size
         global racket_center_x, racket_size
         global block_position_x, block_position_y, block_move_x, block_move_y, block_size_x, block_size_y
         
         is_gameover = False
         point = 0
-        speed = 50
+        life = 3
+        game_speed = 50
         move_speed = 15
         ball_position_x = random.randint(400, 500)
         ball_position_y = random.randint(100, 200)
@@ -85,7 +83,7 @@ def game_start():
                                 block_position_x + block_size_x, block_position_y + block_size_y, fill = 'red')
     #ボールの移動
     def move_ball():
-        global is_gameover, point
+        global is_gameover, point, life
         global ball_position_x, ball_position_y, ball_move_x, ball_move_y
         
         if is_gameover:
@@ -118,7 +116,6 @@ def game_start():
             ball_move_y *= -1
             if ball_move_x < 0:
                 ball_move_x *= -1
-                
             mes = random.randint(0, 2)
             if mes == 0:
                 message = '素敵'
@@ -129,7 +126,11 @@ def game_start():
             point += 10
             root.title(message + '！あなたの得点は' + str(point) + '点です')
         #ミスした時の判定
-        if ball_position_y + ball_move_y >= 480:
+        if ball_position_y + ball_move_y >= 480 and life > 0:
+            life -= 1
+            ball_position_x = random.randint(400, 500)
+            ball_position_y = random.randint(100, 200)
+        elif ball_position_y + ball_move_y >= 480 and life == 0:
             is_gameover = True
             if point <= 50:
                 message = 'ドンマイ'
@@ -158,9 +159,6 @@ def game_start():
            block_position_x + block_move_x - block_size_x / 2 <= ball_position_x + ball_move_x <= block_position_x + block_size_x + block_move_x and \
            block_position_y <= ball_position_y + ball_move_y  <= block_position_y + block_size_y:
             ball_move_x *= -1
-        #ミスの判定
-        if ball_position_y + ball_move_y > 480:
-            is_gameover = True
         #ボールの移動
         if 0 <= ball_position_x + ball_move_x <= 640:
             ball_position_x = ball_position_x + ball_move_x
@@ -200,7 +198,7 @@ def game_start():
         draw_ball()
         move_ball()
         move_block()
-        root.after(speed, game_loop)
+        root.after(game_speed, game_loop)
     #ゲームのメイン処理
     init_game()
     game_loop()

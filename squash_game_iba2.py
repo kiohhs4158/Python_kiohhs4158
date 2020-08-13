@@ -13,7 +13,7 @@ def draw_start():
     canvas_st.create_text(320, 140, text = 'Welcome to Squash Game',
                           fill = 'blue', font = ('Meiryo UI', 24), justify = 'center')
     canvas_st.create_text(320, 220, text = 'ラケットの大きさを選択してください', font = ('Meiryo UI', 16), justify = 'center')
-
+    
     global select
     select = IntVar(start, value = 150)
     #ラジオボタンの設定
@@ -81,6 +81,10 @@ def game_start():
     def draw_block():
         canvas.create_rectangle(block_position_x, block_position_y,
                                 block_position_x + block_size_x, block_position_y + block_size_y, fill = 'red')
+    #的の描画
+    def draw_target():
+        for j in range(3):
+            canvas.create_rectangle(160 * j + 120, 0, 160 * j + 200, 10, fill = 'green')
     #ボールの移動
     def move_ball():
         global is_gameover, point, life
@@ -94,6 +98,11 @@ def game_start():
         #天井に当たったかどうかの判定
         if ball_position_y + ball_move_y < 0:
             ball_move_y *= -1
+        #的に当たった時の判定
+        for k in range(3):
+            if ball_position_y + ball_move_y < 10 and \
+               (160 * k + 120) <= ball_position_x + ball_move_x <= (160 * k + 200):
+                ball_move_y *= -1
         #ラケットの左側に当たったかどうかの判定
         if ball_position_y + ball_move_y >= 470 and \
            racket_left_x - 5 <= ball_position_x + ball_move_x <= racket_center_x:
@@ -193,6 +202,7 @@ def game_start():
     #ゲームの繰り返し処理
     def game_loop():
         draw_game()
+        draw_target()
         draw_racket()
         draw_block()
         draw_ball()

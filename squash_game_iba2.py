@@ -155,6 +155,17 @@ def game_start():
             ball_position_y = random.randint(100, 200)
         elif ball_position_y + ball_move_y >= 480 and life == 0:
             is_gameover = True
+            """
+            if point <= 50:
+                message = 'ドンマイ'
+            elif 50 < point <= 200:
+                message = '次は高得点を目指そう'
+            else:
+                message = 'あなたは最高のプレーヤーです'
+            """
+
+            root.title('あなたの得点は' + str(point) + '点でした！ | GameOver(クリックしてもう一度挑戦しよう)' )
+            """
             #gemeover画面の描画
             canvas.delete('all')
             root.destroy()
@@ -182,21 +193,29 @@ def game_start():
             def close_gameover():
                 canvas_go.delete('all')
                 gameover.destroy()
+        """
+
+        #障害物に当たったかどうかの判定
+        if block_position_x <= ball_position_x + 10 <= block_position_x + block_size_x and \
+            block_position_y <= ball_position_y <= block_position_y + block_size_y:
+            ball_move_x *= -1
+            ball_move_y *= -1
+
+        if another_block_position_x <= ball_position_x + 10 <= another_block_position_x + another_block_size_x and \
+           another_block_position_y <= ball_position_y <= another_block_position_y + another_block_size_y:
+            ball_move_x *= -1
+            ball_move_y *= -1
+        
         #ボールの移動
         if 0 <= ball_position_x + ball_move_x <= 640:
             ball_position_x = ball_position_x + ball_move_x
         if 0 <= ball_position_y + ball_move_y <= 480:
             ball_position_y = ball_position_y + ball_move_y
-        #障害物に当たったかどうかの判定
-        if block_position_x <= ball_position_x <= block_position_x + block_size_x and \
-            block_position_y <= ball_position_y <= block_position_y + block_size_y:
-            ball_move_x *= -1
-            ball_move_y *= -1
-        if another_block_position_x <= ball_position_x <= another_block_position_x + another_block_size_x and \
-           another_block_position_y <= ball_position_y <= another_block_position_y + another_block_size_y:
-            ball_move_x *= -1
-            ball_move_y *= -1
     #ラケットの移動
+    def click(event):
+        if event.num == 1 and is_gameover:
+            init_game()
+            
     def motion(event):
         if is_gameover:
             return
@@ -204,6 +223,7 @@ def game_start():
         global racket_center_x
         racket_center_x = event.x
 
+    root.bind('<Button>', click)
     root.bind('<Motion>', motion)
     #ゲームの繰り返し処理
     def game_loop():

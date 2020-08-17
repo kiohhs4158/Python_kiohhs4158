@@ -61,12 +61,12 @@ def game_start():
         racket_size = select_size
         block_position_x = random.randint(60, 100)
         block_position_y = random.randint(80, 120)
-        block_size_x = random.randint(80, 120)
-        block_size_y = random.randint(80, 140)
+        block_size_x = random.randint(100, 140)
+        block_size_y = random.randint(100, 140)
         another_block_position_x = random.randint(420, 460)
         another_block_position_y = random.randint(80, 120)
-        another_block_size_x = random.randint(80, 120)
-        another_block_size_y = random.randint(80, 140)
+        another_block_size_x = random.randint(100, 140)
+        another_block_size_y = random.randint(100, 140)
     #ゲーム画面の描画
     def draw_game():
         if is_gameover:
@@ -197,15 +197,25 @@ def game_start():
                 gameover.destroy()
         """
 
-        #障害物に当たったかどうかの判定(不完全)
-        if block_position_x <= ball_position_x + 10 <= block_position_x + block_size_x and \
-            block_position_y <= ball_position_y <= block_position_y + block_size_y:
+        #障害物に当たったかどうかの判定
+        if (ball_position_x < block_position_x or block_position_x + block_size_x < ball_position_x) and \
+           block_position_x <= ball_position_x + ball_move_x <= block_position_x + block_size_x and \
+            block_position_y <= ball_position_y + ball_move_y <= block_position_y + block_size_y:
             ball_move_x *= -1
+
+        if (ball_position_y < block_position_y or block_position_y + block_size_y < ball_position_y) and \
+           block_position_x <= ball_position_x + ball_move_x <= block_position_x + block_size_x and \
+            block_position_y <= ball_position_y + ball_move_y <= block_position_y + block_size_y:
             ball_move_y *= -1
 
-        if another_block_position_x <= ball_position_x + 10 <= another_block_position_x + another_block_size_x and \
-           another_block_position_y <= ball_position_y <= another_block_position_y + another_block_size_y:
+        if (ball_position_x < another_block_position_x or another_block_position_x + another_block_size_x < ball_position_x) and \
+           another_block_position_x <= ball_position_x + ball_move_x <= another_block_position_x + another_block_size_x and \
+           another_block_position_y <= ball_position_y + ball_move_y <= another_block_position_y + another_block_size_y:
             ball_move_x *= -1
+
+        if (ball_position_y < another_block_position_y or another_block_position_y + another_block_size_y < ball_position_y) and \
+           another_block_position_x <= ball_position_x + ball_move_x <= another_block_position_x + another_block_size_x and \
+           another_block_position_y <= ball_position_y + ball_move_y <= another_block_position_y + another_block_size_y:
             ball_move_y *= -1
         
         #ボールの移動

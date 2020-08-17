@@ -155,6 +155,7 @@ def game_start():
             ball_position_y = random.randint(100, 200)
         elif ball_position_y + ball_move_y >= 480 and life == 0:
             is_gameover = True
+
             """
             if point <= 50:
                 message = 'ドンマイ'
@@ -165,6 +166,7 @@ def game_start():
             """
 
             root.title('あなたの得点は' + str(point) + '点でした！ | GameOver(クリックしてもう一度挑戦しよう)' )
+
             """
             #gemeover画面の描画
             canvas.delete('all')
@@ -195,7 +197,7 @@ def game_start():
                 gameover.destroy()
         """
 
-        #障害物に当たったかどうかの判定
+        #障害物に当たったかどうかの判定(不完全)
         if block_position_x <= ball_position_x + 10 <= block_position_x + block_size_x and \
             block_position_y <= ball_position_y <= block_position_y + block_size_y:
             ball_move_x *= -1

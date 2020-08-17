@@ -174,10 +174,10 @@ def game_start():
             gameover.title('あなたの得点は' + str(point) + '点でした！' + message)
 
             continue_btn = ttk.Button(gameover, text = 'Continue', width = 30, command = lambda:[close_gameover(), game_start()])
-            continue_btn.place(x = 250, y = 320)
+            continue_btn.place(x = 240, y = 320)
 
             title_btn = ttk.Button(gameover, text = 'Title', width = 30, command = lambda:[close_gameover(), draw_start()])
-            title_btn.place(x = 250, y = 390)
+            title_btn.place(x = 240, y = 390)
     
             def close_gameover():
                 canvas_go.delete('all')
